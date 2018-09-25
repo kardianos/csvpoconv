@@ -18,6 +18,10 @@ func main() {
 		log.Fatal("missing output (o) parameter")
 	}
 
+	if len(flag.Args()) == 0 {
+		log.Fatal("missing input files after exec")
+	}
+
 	of, err := os.OpenFile(*o, os.O_CREATE|os.O_CREATE|os.O_WRONLY, 0700)
 	if err != nil {
 		log.Fatalf("failed to open %q: %v", *o, err)
