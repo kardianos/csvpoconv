@@ -89,6 +89,6 @@ func readFileReader(w *csv.Writer, rf io.Reader) error {
 			continue
 		}
 		w.Write([]string{"H", po, proc, date, loc, loc})
-		w.Write([]string{"R", itemNumb, qty, strings.TrimPrefix(price, "$")})
+		w.Write([]string{"R", itemNumb, qty, strings.TrimLeft(price, "$ ")})
 	}
 }
