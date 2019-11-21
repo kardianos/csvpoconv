@@ -60,6 +60,8 @@ func readFileReader(w *csv.Writer, rf io.Reader) error {
 	r.TrimLeadingSpace = true
 	r.TrailingComma = true
 
+	qtyReplace := strings.NewReplacer(",", "", ".00", "")
+
 	for {
 		row, err := r.Read()
 		if err != nil {
@@ -69,26 +71,28 @@ func readFileReader(w *csv.Writer, rf io.Reader) error {
 			}
 			return err
 		}
-		if len(row) < 7 {
+		if len(row) < 10 {
 			continue
 		}
 
-		date := row[0]
-		po := row[1]
-		loc := row[2]
-		proc := row[3]
+		date := row[2]
+		po := row[3]
+		loc := row[4]
+		proc := row[5]
 
-		itemNumb := row[4]
-		qty := row[5]
-		price := row[6]
+		itemNumb := row[6]
+		qty := row[8]
+		price := row[9]
 
-		if date == "Date" {
+		if date == "Day" {
 			continue
 		}
 		if strings.HasPrefix(date, "Week") {
 			continue
 		}
+		price = strings.TrimLeft(price, "$ ")
+		qty = qtyReplace.Replace(qty)
 		w.Write([]string{"H", po, proc, date, loc, loc})
-		w.Write([]string{"R", itemNumb, qty, strings.TrimLeft(price, "$ ")})
+		w.Write([]string{"R", itemNumb, qty, price})
 	}
 }
