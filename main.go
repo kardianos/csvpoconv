@@ -22,6 +22,20 @@ func main() {
 		log.Fatal("missing input files after exec")
 	}
 
+	fileList := []string{}
+	
+	for _, rawFilename := range flag.Args() {
+		filenames, err := filepath.Glob(rawFilename)
+		if err != nil {
+			log.Fatalf("failed to glob %q: %v", rawFilename, err)
+		}
+		fileList = append(fileList, filenames...)
+	}
+	
+	if len(fileList) == 0 {
+		log.Fatal("no files to read")
+	}
+	
 	of, err := os.OpenFile(*o, os.O_CREATE|os.O_CREATE|os.O_WRONLY, 0700)
 	if err != nil {
 		log.Fatalf("failed to open %q: %v", *o, err)
@@ -31,16 +45,10 @@ func main() {
 	w := csv.NewWriter(of)
 	w.UseCRLF = true
 
-	for _, rawFilename := range flag.Args() {
-		filenames, err := filepath.Glob(rawFilename)
+	for _, filename := range fileList {
+		err = readFile(w, filename)
 		if err != nil {
-			log.Fatalf("failed to glob %q: %v", rawFilename, err)
-		}
-		for _, filename := range filenames {
-			err = readFile(w, filename)
-			if err != nil {
-				log.Fatalf("failed to read file %q: %v", filename, err)
-			}
+			log.Fatalf("failed to read file %q: %v", filename, err)
 		}
 	}
 }
